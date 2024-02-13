@@ -77,8 +77,18 @@ ulimit -n 4096
 echo "Enter the name of your node:"
 read MY_NODE_NAME
 
-# Retrieve the external IP address of the server (ensure IPv4)
-IP_ADDRESS=$(curl -4s ifconfig.me)
+# If IP_ADDRESS is empty, prompt the user to enter it manually
+if [ -z "$IP_ADDRESS" ]; then
+    echo "Could not automatically determine the server's IP address."
+    echo "Please enter the server's external IP address manually:"
+    read IP_ADDRESS
+fi
+
+# Validate the IP_ADDRESS input
+if [[ ! $IP_ADDRESS =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Invalid IP address format. Exiting."
+    exit 1
+fi
 
 # Join the testnet with specified external address and moniker
 cd /root/penumbra
