@@ -26,16 +26,19 @@ sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl
 sudo apt-get install tmux
 
-# Install Go 1.21.1
-GO_VERSION="1.21.1"
-wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz
-sudo tar -xvf go${GO_VERSION}.linux-amd64.tar.gz
-sudo mv go /usr/local
+# Check if Go is installed and update it if it is not version 1.21.1
+CURRENT_GO_VERSION=$(go version | grep -oP 'go\K[0-9.]+')
+if [ "$CURRENT_GO_VERSION" != "1.21.1" ]; then
+    echo "Updating Go to version 1.21.1..."
+    sudo rm -rf /usr/local/go
+    wget https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz
+    sudo tar -xvf go1.21.1.linux-amd64.tar.gz -C /usr/local
+fi
 
 # Set Go environment variables
 echo "export GOROOT=/usr/local/go" >> $HOME/.profile
 echo "export GOPATH=$HOME/go" >> $HOME/.profile
-echo "export PATH=$GOPATH/bin:$GOROOT/bin:$PATH" >> $HOME/.profile
+echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> $HOME/.profile
 source $HOME/.profile
 
 # Install Rust
