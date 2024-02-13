@@ -109,4 +109,4 @@ source $HOME/.profile
 
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
-tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/
+tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
