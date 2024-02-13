@@ -29,5 +29,5 @@ This script is designed for the automated installation and configuration of a Pe
 ## Usage
 To run the script, simply execute:
 ```bash
-chmod +x penumbra_installer.sh
-./penumbra_installer.sh
+chmod +x penumbra_nodes_bond_installer.sh
+./penumbra_nodes_bond_installer.sh
