@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Author: nodes.bond
+# Penumbra Version: v0.67.0
+# Go Version: 1.21.1
+# Cometbft Version: v0.37.2
+
 # Check Ubuntu Version
 UBUNTU_VERSION=$(lsb_release -sr)
 if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
