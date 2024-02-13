@@ -12,7 +12,7 @@ This script is designed for the automated installation and configuration of a Pe
 1. The script removes previous versions of Penumbra and related modules.
 2. Renames existing Penumbra directory for updates.
 3. Updates package list and installs dependencies.
-4. Installs Go 1.20 and sets environment variables.
+4. Installs Go 1.21.1 and sets environment variables.
 5. Installs Rust and sets up the environment.
 6. Clones the Penumbra repository and checks out the specified version.
 7. Builds `pcli` and `pd`.
