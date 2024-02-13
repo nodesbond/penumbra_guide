@@ -20,8 +20,8 @@ fi
 sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl
 
-# Install Go 1.20
-GO_VERSION="1.20"
+# Install Go 1.21.1
+GO_VERSION="1.21.1"
 wget https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz
 sudo tar -xvf go${GO_VERSION}.linux-amd64.tar.gz
 sudo mv go /usr/local
