@@ -24,6 +24,7 @@ fi
 # Update package list and install dependencies
 sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl
+sudo apt-get install tmux
 
 # Install Go 1.21.1
 GO_VERSION="1.21.1"
