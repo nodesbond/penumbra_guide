@@ -1,7 +1,12 @@
 #!/bin/bash
 
-# Installing jq for JSON processing
-sudo apt install -y jq
+# Check for jq and install if not found
+if ! command -v jq &> /dev/null; then
+    echo "jq could not be found, installing now..."
+    sudo apt-get update && sudo apt-get install -y jq
+else
+    echo "jq is already installed."
+fi
 
 # Checking the synchronization status of the node
 SYNC_STATUS=$(curl -s http://0.0.0.0:26657/status | jq .result.sync_info.catching_up)
