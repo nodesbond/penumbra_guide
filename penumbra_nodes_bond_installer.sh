@@ -116,6 +116,13 @@ else
     exit 1
 fi
 
+PCLI_DIR="/root/.local/share/pcli"
+
+if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
+    echo "The pcli directory is not empty. Renaming the existing directory..."
+    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
+fi
+
 # Add pcli to the system path for simplified command usage
 echo "export PATH=\$PATH:/root/penumbra/target/release" >> $HOME/.profile
 source $HOME/.profile
