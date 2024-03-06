@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Author: nodes.bond
-# Penumbra Version: v0.68.0
+# Penumbra Version: v0.68.
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.2
 
