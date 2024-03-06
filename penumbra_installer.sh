@@ -66,6 +66,13 @@ cargo build --release --bin pd
 
 #Move binary files 
 echo "Moving Binaries"
+cd /home/whispernode/penumbra/target/release/
+chmod +x pd
+chmod +x pcli
+sudo mv /home/whispernode/penumbra/target/release/pd /usr/local/bin/pd
+sudo mv /home/whispernode/penumbra/target/release/pcli /usr/local/bin/pcli
+sudo cp /usr/local/bin/pd /home/whispernode/go/bin/pd
+sudo cp /usr/local/bin/pcli /home/whispernode/go/bin/pcli
 
 
 # Check Versions
