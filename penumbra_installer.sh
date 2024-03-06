@@ -128,21 +128,21 @@ cd /home/whispernode/penumbra
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 if [ "$WALLET_CHOICE" = "new" ]; then
-    SEED_PHRASE=$(./target/release/pcli init soft-kms generate)
+    SEED_PHRASE=$(pcli init soft-kms generate)
     echo "Your seed phrase is: $SEED_PHRASE"
     echo "Write down your seed phrase and keep it safe. Press any key to continue."
     read -n 1 -s
 elif [ "$WALLET_CHOICE" = "restore" ]; then
-    ./target/release/pcli init soft-kms import-phrase
+    pcli init soft-kms import-phrase
     echo "Enter your seed phrase:"
     read SEED_PHRASE
-    echo $SEED_PHRASE | ./target/release/pcli init soft-kms import-phrase
+    echo $SEED_PHRASE | pcli init soft-kms import-phrase
 else
     echo "Invalid choice. Exiting."
     exit 1
 fi
 
-PCLI_DIR="/home/whispernode/.local/share/pcli"
+PCLI_DIR="/home/whispernode/go/bin/pcli"
 
 if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
     echo "The pcli directory is not empty. Renaming the existing directory..."
@@ -150,8 +150,8 @@ if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
 fi
 
 # Add pcli to the system path for simplified command usage
-echo "export PATH=\$PATH:/home/whispernode/penumbra/target/release" >> $HOME/.zshrc
-source $HOME/.zshrc
+#echo "export PATH=\$PATH:/home/whispernode/go/bin" >> $HOME/.zshrc
+#source $HOME/.zshrc
 
 #Swap Validator Key Files 
 echo "Swapping Validator Key"
