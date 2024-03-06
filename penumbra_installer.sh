@@ -17,10 +17,9 @@ if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
 fi
 
 #Copy Old keys and config file
-echo "Copying validator key and config..."
+echo "Copying old config..."
 cd /home/whispernode/.penumbra/testnet_data/node0/cometbft/config
 sudo cp config.toml /home/whispernode/penumbraconfig.toml
-sudo cp priv_validator_key.json /home/whispernode/penumbra_priv_validator_key.json
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
@@ -154,8 +153,5 @@ fi
 #source $HOME/.zshrc
 
 #Swap Validator Key Files 
-echo "Swapping Validator Key"
-cd /home/whispernode/.penumbra/testnet_data/node0/cometbft/config
-cp /home/whispernode/penumbra_priv_validator_key.json priv_validator_key.json 
 
 echo "Change your config and start services!"
