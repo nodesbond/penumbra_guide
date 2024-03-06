@@ -121,8 +121,8 @@ fi
 
 # Join the testnet with specified external address and moniker
 cd /home/whispernode/penumbra
-./target/release/pd testnet unsafe-reset-all
-./target/release/pd testnet join --external-address $IP_ADDRESS:21956 --moniker $(openssl rand -hex 16)
+pd testnet unsafe-reset-all
+pd testnet join --external-address 142.132.154.53:21956 --moniker $(openssl rand -hex 16)
 
 # Create a new wallet or restore an existing one 
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
