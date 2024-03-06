@@ -48,7 +48,7 @@ echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> $HOME/.zshrc
 source $HOME/.zshrc
 
 # Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y 
 source $HOME/.cargo/env
 
 # Clone Penumbra repository and checkout the specified version
