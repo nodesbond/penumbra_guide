@@ -51,6 +51,9 @@ source $HOME/.zshrc
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y 
 source $HOME/.cargo/env
 
+#Give correct permissions to user
+sudo chown -R whispernode /home/whispernode/penumbra/target/release/
+
 # Clone Penumbra repository and checkout the specified version
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
