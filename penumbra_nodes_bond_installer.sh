@@ -98,6 +98,8 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
+cd /root/penumbra
+
 # Create a new wallet or restore an existing one 
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
