@@ -81,6 +81,7 @@ echo "Enter the name of your node:"
 read MY_NODE_NAME
 
 # If IP_ADDRESS is empty, prompt the user to enter it manually
+IP_ADDRESS=$(curl -4s ifconfig.me)
 if [ -z "$IP_ADDRESS" ]; then
     echo "Could not automatically determine the server's IP address."
     echo "Please enter the server's external IP address manually:"
@@ -98,31 +99,48 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
-cd /root/penumbra
+# Handle non-empty pcli directory
+PCLI_DIR="/root/.local/share/pcli"
+if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
+    echo "The pcli directory is not empty."
+    echo "Choose an action:"
+    echo "1) Rename and backup the existing directory"
+    echo "2) Delete the existing directory (Warning: This will remove all existing data)"
+    read -p "Enter choice [1-2]: " choice
+
+    case $choice in
+        1)
+            BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
+            echo "Renaming the existing directory to $BACKUP_DIR..."
+            mv "$PCLI_DIR" "$BACKUP_DIR"
+            ;;
+        2)
+            echo "Removing the existing pcli directory..."
+            rm -rf "$PCLI_DIR"
+            ;;
+        *)
+            echo "Invalid choice. Exiting."
+            exit 1
+            ;;
+    esac
+fi
 
 # Create a new wallet or restore an existing one 
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 if [ "$WALLET_CHOICE" = "new" ]; then
-    SEED_PHRASE=$(pcli init soft-kms generate)
+    SEED_PHRASE=$(./target/release/pcli init soft-kms generate)
     echo "Your seed phrase is: $SEED_PHRASE"
     echo "Write down your seed phrase and keep it safe. Press any key to continue."
     read -n 1 -s
 elif [ "$WALLET_CHOICE" = "restore" ]; then
-    pcli init soft-kms import-phrase
+    ./target/release/pcli init soft-kms import-phrase
     echo "Enter your seed phrase:"
     read SEED_PHRASE
-    echo $SEED_PHRASE | pcli init soft-kms import-phrase
+    echo $SEED_PHRASE | ./target/release/pcli init soft-kms import-phrase
 else
     echo "Invalid choice. Exiting."
     exit 1
-fi
-
-PCLI_DIR="/root/.local/share/pcli"
-
-if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
-    echo "The pcli directory is not empty. Renaming the existing directory..."
-    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
 fi
 
 # Add pcli to the system path for simplified command usage
