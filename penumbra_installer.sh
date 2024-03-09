@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Author: WhisperNode
-# Penumbra Version: v0.68.2
+# Penumbra Version: v0.69.0
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.2
 
@@ -57,7 +57,7 @@ sudo chown -R whispernode /home/whispernode/penumbra/target/release/
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
 git fetch
-git checkout v0.68.2
+git checkout v0.69.0
 
 # Build pcli and pd
 cargo build --release --bin pcli
