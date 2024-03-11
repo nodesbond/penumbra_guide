@@ -8,18 +8,34 @@ else
     echo "jq is already installed."
 fi
 
-# Checking the synchronization status of the node
-SYNC_STATUS=$(curl -s http://0.0.0.0:26657/status | jq .result.sync_info.catching_up)
-if [ "$SYNC_STATUS" = "true" ]; then
-    echo "Your node is not synchronized. Please wait until it is fully synced before proceeding."
+# Attempt to automatically determine the server's public IP address
+IP_ADDRESS=$(curl -4s ifconfig.me)
+
+# If automatic IP detection fails, prompt for manual input
+if [ -z "$IP_ADDRESS" ]; then
+    echo "Could not automatically determine the server's IP address."
+    echo "Please enter the server's external IP address manually:"
+    read IP_ADDRESS
+fi
+
+# Validate the IP_ADDRESS input
+if [[ ! $IP_ADDRESS =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Invalid IP address format. Exiting."
     exit 1
 fi
 
-# Changing to the Penumbra directory
-cd /root/penumbra
+# Checking the synchronization status of the node using the IP address
+SYNC_STATUS=$(curl -s http://$IP_ADDRESS:26657/status | jq -r .result.sync_info.catching_up)
+
+if [ "$SYNC_STATUS" = "true" ]; then
+    echo "Your node is not synchronized. Please wait until it is fully synced before proceeding."
+    exit 1
+else
+    echo "Node is synchronized. Continuing with validator setup."
+fi
 
 # Creating the validator.toml file
-./target/release/pcli validator definition template \
+pcli validator definition template \
     --tendermint-validator-keyfile ~/.penumbra/testnet_data/node0/cometbft/config/priv_validator_key.json \
     --file validator.toml
 
@@ -32,8 +48,8 @@ sed -i "s/enabled = false/enabled = true/" validator.toml
 sed -i "s/name = \".*\"/name = \"$VALIDATOR_NAME\"/" validator.toml
 
 # Uploading the validator definition
-./target/release/pcli validator definition upload --file validator.toml
+pcli validator definition upload --file validator.toml
 
 # Retrieving and displaying the validator identity
-VALIDATOR_IDENTITY=$(./target/release/pcli validator identity)
+VALIDATOR_IDENTITY=$(pcli validator identity)
 echo "Validator identity: $VALIDATOR_IDENTITY"
