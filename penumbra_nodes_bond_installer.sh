@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Author: nodes.bond
-# Penumbra Version: v0.69.1
+# Penumbra Version: v0.70.0
 # Go Version: 1.21.1
-# Cometbft Version: v0.37.2
+# Cometbft Version: v0.37.5
 
 # Check Ubuntu Version
 UBUNTU_VERSION=$(lsb_release -sr)
@@ -49,7 +49,7 @@ source $HOME/.cargo/env
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
 git fetch
-git checkout v0.69.1
+git checkout v0.70.0
 
 # Build pcli and pd
 cargo build --release --bin pcli
@@ -59,7 +59,7 @@ cargo build --release --bin pd
 cd /root
 git clone https://github.com/cometbft/cometbft.git
 cd cometbft
-git checkout v0.37.2
+git checkout v0.37.5
 
 # Update Go modules
 go mod tidy
