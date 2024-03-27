@@ -14,11 +14,19 @@ fi
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
-sudo rm -rf /root/penumbra /root/cometbft /root/.local/share/pcli/
+sudo rm -rf /root/penumbra /root/cometbft
 
 # Rename existing Penumbra directory (for updates)
 if [ -d "/root/penumbra" ]; then
     mv /root/penumbra /root/penumbra_old
+fi
+
+# Handle non-empty pcli directory
+PCLI_DIR="/root/.local/share/pcli"
+if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
+    echo "The pcli directory is not empty."
+    echo "Renaming the existing directory to ${PCLI_DIR}_backup_$(date +%F-%T)..."
+    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
 fi
 
 # Update package list and install dependencies
