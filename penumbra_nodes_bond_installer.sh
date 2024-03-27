@@ -25,8 +25,26 @@ fi
 PCLI_DIR="/root/.local/share/pcli"
 if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
     echo "The pcli directory is not empty."
-    echo "Renaming the existing directory to ${PCLI_DIR}_backup_$(date +%F-%T)..."
-    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
+    echo "Choose an action:"
+    echo "1) Rename and backup the existing directory"
+    echo "2) Delete the existing directory (Warning: This will remove all existing data)"
+    read -p "Enter choice [1-2]: " choice
+
+    case $choice in
+        1)
+            BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
+            echo "Renaming the existing directory to $BACKUP_DIR..."
+            mv "$PCLI_DIR" "$BACKUP_DIR"
+            ;;
+        2)
+            echo "Removing the existing pcli directory..."
+            rm -rf "$PCLI_DIR"
+            ;;
+        *)
+            echo "Invalid choice. Exiting."
+            exit 1
+            ;;
+    esac
 fi
 
 # Update package list and install dependencies
@@ -106,32 +124,6 @@ fi
 cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
-
-# Handle non-empty pcli directory
-PCLI_DIR="/root/.local/share/pcli"
-if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
-    echo "The pcli directory is not empty."
-    echo "Choose an action:"
-    echo "1) Rename and backup the existing directory"
-    echo "2) Delete the existing directory (Warning: This will remove all existing data)"
-    read -p "Enter choice [1-2]: " choice
-
-    case $choice in
-        1)
-            BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
-            echo "Renaming the existing directory to $BACKUP_DIR..."
-            mv "$PCLI_DIR" "$BACKUP_DIR"
-            ;;
-        2)
-            echo "Removing the existing pcli directory..."
-            rm -rf "$PCLI_DIR"
-            ;;
-        *)
-            echo "Invalid choice. Exiting."
-            exit 1
-            ;;
-    esac
-fi
 
 # Create a new wallet or restore an existing one 
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
