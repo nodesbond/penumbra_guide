@@ -113,14 +113,13 @@ fi
 # Proceed with installation
 make install
 
-# Increase the number of allowed open file descriptors
+# Increase the number of allowed open file directors
 ulimit -n 4096
-
-# Request the node name from the user
 
 # Request the node name from the user
 echo "Enter the name of your node:"
 read MY_NODE_NAME
+
 # If IP_ADDRESS is empty, prompt the user to enter it manually
 IP_ADDRESS=$(curl -4s ifconfig.me)
 if [ -z "$IP_ADDRESS" ]; then
@@ -140,7 +139,7 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
-# Create a new wallet or restore an existing one 
+# Create a new wallet or restore an existing one
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 if [ "$WALLET_CHOICE" = "new" ]; then
@@ -165,5 +164,6 @@ source $HOME/.profile
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
 tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
+
 # Restore original home directory at end of script
 export HOME=$ORIGINAL_HOME
