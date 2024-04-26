@@ -5,7 +5,7 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
-# Ensure required utilities are installed
+# Ensure necessary tools are installed
 sudo apt-get update
 sudo apt-get install -y bc tmux
 
@@ -16,7 +16,18 @@ if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     exit 1
 fi
 
-set -euo pipefail
+# Set robust bash scripting mode
+set -eo pipefail
+
+# Handle unbound variables gracefully
+set +u
+
+# Load profile if it exists to avoid errors
+if [ -f "$HOME/.profile" ]; then
+    source $HOME/.profile
+fi
+
+set -u # Re-enable checking for unbound variables
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
@@ -27,15 +38,7 @@ if [ -d "/root/penumbra" ]; then
     mv /root/penumbra /root/penumbra_old
 fi
 
-# Handle non-empty pcli directory
-PCLI_DIR="/root/.local/share/pcli"
-if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
-    echo "The pcli directory is not empty."
-    echo "Renaming the existing directory..."
-    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
-fi
-
-# Recheck and install other dependencies
+# Update package list and install dependencies
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs libclang-dev curl
 
 # Check if Go is installed and update it if it is not version 1.21.1
