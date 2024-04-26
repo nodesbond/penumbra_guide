@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# Check if running interactively
+# Check if running interactively and set PS1 if not
 if [ -z "$PS1" ]; then
-    echo "This script is intended to be run in an interactive shell."
+    echo "Setting default PS1 as the script is not running interactively."
     export PS1='\h:\w\$ '
 fi
+
+# Ensure debian_chroot is set for .bashrc if used in the script
+export debian_chroot=${debian_chroot:-"default_value"}
 
 # Author: nodes.bond
 # Penumbra Version: v0.73.0
@@ -100,12 +103,8 @@ go mod tidy
 # Compile the cometbft executable
 go build -o cometbft ./cmd/cometbft
 
-# Move the compiled executable to a specific directory inside /root/cometbft if not already there
-if [ ! -f /root/cometbft/cometbft ]; then
-    mv cometbft /root/cometbft/
-else
-    echo "Executable already in place."
-fi
+# Move the compiled executable to the cometbft directory
+mv cometbft /root/cometbft/
 
 # Proceed with installation
 make install
@@ -160,4 +159,4 @@ source $HOME/.profile
 
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
-tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' and tmux attach -t penumbra
+tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
