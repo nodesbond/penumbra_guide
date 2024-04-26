@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if running interactively
+if [ -z "$PS1" ]; then
+    echo "Setting default PS1 as the script is not running interactively."
+    export PS1='\h:\w\$ '
+fi
+
 # Author: nodes.bond
 # Penumbra Version: v0.73.0
 # Go Version: 1.21.1
