@@ -2,7 +2,7 @@
 
 # Check if running interactively
 if [ -z "$PS1" ]; then
-    echo "Setting default PS1 as the script is not running interactively."
+    echo "This script is intended to be run in an interactive shell."
     export PS1='\h:\w\$ '
 fi
 
@@ -143,8 +143,7 @@ if [ "$WALLET_CHOICE" = "new" ]; then
     SEED_PHRASE=$(./target/release/pcli init soft-kms generate)
     echo "Your seed phrase is: $SEED_PHRASE"
     echo "Write down your seed phrase and keep it safe. Press any key to continue."
-    read -n 1 -s  # This command or another might source .bashrc
-    set -u  # Re-enable exit on unset variable
+    read -n 1 -s
 elif [ "$WALLET_CHOICE" = "restore" ]; then
     ./target/release/pcli init soft-kms import-phrase
     echo "Enter your seed phrase:"
