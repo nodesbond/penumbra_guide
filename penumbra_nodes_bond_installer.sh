@@ -126,6 +126,16 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
+# Handle non-empty pcli directory
+PCLI_DIR="/tmp/.local/share/pcli"
+if [ -d "$PCLI_DIR" ]; then
+    if [ "$(ls -A $PCLI_DIR)" ]; then
+        echo "The pcli directory at $PCLI_DIR is not empty."
+        echo "Existing contents will be removed to continue with a clean initialization."
+        rm -rf ${PCLI_DIR:?}/*  # Using parameter expansion to avoid catastrophic deletion
+    fi
+fi
+
 # Configure wallet
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
