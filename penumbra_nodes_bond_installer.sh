@@ -95,8 +95,19 @@ git clone https://github.com/cometbft/cometbft.git
 cd cometbft
 git checkout v0.37.5
 go mod tidy
+
+# Compile the cometbft executable
 go build -o cometbft ./cmd/cometbft
-mv cometbft /root/cometbft/
+
+# Move the compiled executable to a specific directory inside /root/cometbft if not already there
+if [ ! -f /root/cometbft/cometbft ]; then
+    mv cometbft /root/cometbft/
+else
+    echo "Executable already in place."
+fi
+
+# Proceed with installation
+make install
 
 # Prepare for node operation
 make install
