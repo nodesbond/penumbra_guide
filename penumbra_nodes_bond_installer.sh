@@ -5,8 +5,7 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
-# Check if the script is running in an interactive shell
-if [[ $- == *i* ]]; then
+
     # Check Ubuntu Version
     UBUNTU_VERSION=$(lsb_release -sr)
     if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
@@ -154,6 +153,3 @@ if [[ $- == *i* ]]; then
     # Launch the node and CometBFT in tmux
     tmux kill-session -t penumbra
     tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
-else
-    echo "This script is intended to be run in an interactive shell."
-fi
