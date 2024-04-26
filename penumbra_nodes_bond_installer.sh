@@ -12,6 +12,13 @@ if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     exit 1
 fi
 
+set -euo pipefail
+
+# Ensure debian_chroot is not causing issues
+if ! grep -q "debian_chroot=" /root/.bashrc; then
+    echo "debian_chroot=\${debian_chroot:-}" >> /root/.bashrc
+    source /root/.bashrc
+fi
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
@@ -26,35 +33,17 @@ fi
 PCLI_DIR="/root/.local/share/pcli"
 if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
     echo "The pcli directory is not empty."
-    echo "Choose an action:"
-    echo "1) Rename and backup the existing directory"
-    echo "2) Delete the existing directory (Warning: This will remove all existing data)"
-    read -p "Enter choice [1-2]: " choice
-
-    case $choice in
-        1)
-            BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
-            echo "Renaming the existing directory to $BACKUP_DIR..."
-            mv "$PCLI_DIR" "$BACKUP_DIR"
-            ;;
-        2)
-            echo "Removing the existing pcli directory..."
-            rm -rf "$PCLI_DIR"
-            ;;
-        *)
-            echo "Invalid choice. Exiting."
-            exit 1
-            ;;
-    esac
+    echo "Renaming the existing directory to backup..."
+    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
 fi
 
 # Update package list and install dependencies
 sudo apt-get update
-sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl
+sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl bc
 sudo apt-get install tmux
 
 # Check if Go is installed and update it if it is not version 1.21.1
-CURRENT_GO_VERSION=$(go version | grep -oP 'go\K[0-9.]+')
+CURRENT_GO_VERSION=$(go version 2>/dev/null | grep -oP 'go\K[0-9.]+')
 if [ "$CURRENT_GO_VERSION" != "1.21.1" ]; then
     echo "Updating Go to version 1.21.1..."
     sudo rm -rf /usr/local/go
@@ -126,7 +115,7 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
-# Create a new wallet or restore an existing one 
+# Create a new wallet or restore an existing one
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 if [ "$WALLET_CHOICE" = "new" ]; then
