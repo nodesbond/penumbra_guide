@@ -5,15 +5,14 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
-# Ensure the script exits on any error
-set -e
-
 # Check Ubuntu Version
 UBUNTU_VERSION=$(lsb_release -sr)
 if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     echo "This script requires Ubuntu version 22 or higher. Your version is $UBUNTU_VERSION."
     exit 1
 fi
+
+set -euo pipefail
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
@@ -24,26 +23,26 @@ if [ -d "/root/penumbra" ]; then
     mv /root/penumbra /root/penumbra_old
 fi
 
-# Clearing any unused packages
-sudo apt autoremove -y
-
 # Update package list and install dependencies
-echo "Updating package lists..."
 sudo apt-get update
+sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl bc
 
-echo "Installing required packages..."
-sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl bc tmux
+# Install tmux if not already installed
+if ! command -v tmux &> /dev/null; then
+    sudo apt-get install -y tmux
+fi
 
-# Check if Go is installed and update it if it is not the latest version
-CURRENT_GO_VERSION=$(go version | grep -oP 'go\K[0-9.]+')
-if [ "$CURRENT_GO_VERSION" != "1.21.1" ]; then
+# Check if Go is installed and update it if it is not version 1.21.1
+if ! go version | grep -q "go1.21.1"; then
     echo "Updating Go to version 1.21.1..."
     sudo rm -rf /usr/local/go
     wget https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz
     sudo tar -xvf go1.21.1.linux-amd64.tar.gz -C /usr/local
+    export GOROOT=/usr/local/go
+    export PATH=$PATH:$GOROOT/bin
 fi
 
-# Set Go environment variables
+# Set Go and Rust environment variables
 echo "Setting environment variables..."
 echo "export GOROOT=/usr/local/go" >> $HOME/.profile
 echo "export GOPATH=$HOME/go" >> $HOME/.profile
@@ -51,9 +50,11 @@ echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> $HOME/.profile
 source $HOME/.profile
 
 # Install Rust
-echo "Installing Rust..."
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
+if ! command -v cargo &> /dev/null; then
+    echo "Installing Rust..."
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    source $HOME/.cargo/env
+fi
 
 # Clone Penumbra repository and checkout the specified version
 echo "Cloning Penumbra repository..."
@@ -70,7 +71,9 @@ cargo build --release --bin pd
 # Install CometBFT
 echo "Installing CometBFT..."
 cd /root
-git clone https://github.com/cometbft/cometbft.git
+if [ ! -d "/root/cometbft" ]; then
+    git clone https://github.com/cometbft/cometbft.git
+fi
 cd cometbft
 git checkout v0.37.5
 
@@ -112,8 +115,8 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
-# Wallet setup
-echo "Setting up the wallet..."
+# Create a new wallet or restore an existing one
+echo "Configuring the wallet..."
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 case $WALLET_CHOICE in
