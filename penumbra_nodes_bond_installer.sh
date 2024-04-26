@@ -116,16 +116,27 @@ ulimit -n 4096
 # Set up node configuration
 echo "Enter the name of your node:"
 read MY_NODE_NAME
+# Attempt to automatically determine the external IP address
 IP_ADDRESS=$(curl -4s ifconfig.me)
+
+# If the IP address is empty, prompt the user to enter it manually
 if [ -z "$IP_ADDRESS" ]; then
-    echo "Could not automatically determine the server's IP address. Please enter it manually:"
+    echo "Could not automatically determine the server's IP address."
+    echo "Please enter your server's external IP address manually:"
     read IP_ADDRESS
 fi
 
+# Validate the IP address format
 if [[ ! $IP_ADDRESS =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "Invalid IP address format. Exiting."
+    echo "Invalid IP address format. Please enter a valid IP address."
     exit 1
 fi
+
+# Continue with using the IP_ADDRESS in further commands
+echo "Using IP address: $IP_ADDRESS"
+# Example of further use: Adjust according to your actual needs
+# ./some_command_that_uses_ip_address --ip $IP_ADDRESS
+
 
 cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
@@ -160,3 +171,4 @@ tmux detach
 
 # Restore original home directory after detaching from TMUX
 export HOME=$ORIGINAL_HOME
+tmux attach -t penumbra
