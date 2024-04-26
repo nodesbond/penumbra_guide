@@ -140,9 +140,12 @@ fi
 echo "export PATH=\$PATH:/root/penumbra/target/release" >> $HOME/.profile
 source $HOME/.profile
 
-# Manage TMUX sessions
+# Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
 tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
 
-# Restore original home directory
+# Detach from TMUX session programmatically
+tmux detach
+
+# Restore original home directory after detaching from TMUX
 export HOME=$ORIGINAL_HOME
