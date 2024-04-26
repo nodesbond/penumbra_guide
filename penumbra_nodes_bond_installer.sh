@@ -5,18 +5,13 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
-# Set error handling
-set -euo pipefail
-
-# Set a default PS1 if not set to avoid errors with 'unbound variable'
-export PS1="${PS1:-\$ }"
-
 # Check Ubuntu Version
 UBUNTU_VERSION=$(lsb_release -sr)
 if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     echo "This script requires Ubuntu version 22 or higher. Your version is $UBUNTU_VERSION."
     exit 1
 fi
+
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
