@@ -40,28 +40,12 @@ fi
 
 # Handle non-empty pcli directory
 PCLI_DIR="/root/.local/share/pcli"
-if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
-    echo "The pcli directory is not empty."
-    echo "Choose an action:"
-    echo "1) Rename and backup the existing directory"
-    echo "2) Delete the existing directory (Warning: This will remove all existing data)"
-    read -p "Enter choice [1-2]: " choice
-
-    case $choice in
-        1)
-            BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
-            echo "Renaming the existing directory to $BACKUP_DIR..."
-            mv "$PCLI_DIR" "$BACKUP_DIR"
-            ;;
-        2)
-            echo "Removing the existing pcli directory..."
-            rm -rf "$PCLI_DIR"
-            ;;
-        *)
-            echo "Invalid choice. Exiting."
-            exit 1
-            ;;
-    esac
+if [ -d "$PCLI_DIR" ]; then
+    if [ "$(ls -A $PCLI_DIR)" ]; then
+        echo "The pcli directory at $PCLI_DIR is not empty."
+        echo "Existing contents will be removed to continue with a clean initialization."
+        rm -rf ${PCLI_DIR:?}/*  # Using parameter expansion to avoid catastrophic deletion
+    fi
 fi
 
 # Update package list and install dependencies
