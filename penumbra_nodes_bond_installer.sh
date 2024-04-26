@@ -52,7 +52,8 @@ fi
 # Update package list and install dependencies
 sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl
-sudo apt-get install -y tmux bc # ensure tmux and bc are installed
+sudo apt-get install -y bc  # Ensure bc is installed for version comparison
+sudo apt-get install tmux
 
 # Check if Go is installed and update it if it is not version 1.21.1
 CURRENT_GO_VERSION=$(go version 2>/dev/null | grep -oP 'go\K[0-9.]+') || true
@@ -61,12 +62,14 @@ if [ "$CURRENT_GO_VERSION" != "1.21.1" ]; then
     sudo rm -rf /usr/local/go
     wget https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz
     sudo tar -xvf go1.21.1.linux-amd64.tar.gz -C /usr/local
-    export GOROOT=/usr/local/go
-    export PATH=$PATH:/usr/local/go/bin # Update PATH for the current shell
 fi
 
-echo "export GOROOT=/usr/local/go" >> $HOME/.profile
-echo "export PATH=$PATH:/usr/local/go/bin" >> $HOME/.profile
+# Set Go environment variables
+echo 'if [ -n "$PS1" ]; then' >> $HOME/.bashrc
+echo '    export GOROOT=/usr/local/go' >> $HOME/.bashrc
+echo '    export GOPATH=$HOME/go' >> $HOME/.bashrc
+echo '    export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin' >> $HOME/.bashrc
+echo 'fi' >> $HOME/.bashrc
 source $HOME/.profile
 
 # Install Rust
@@ -109,7 +112,7 @@ echo "Enter the name of your node:"
 read MY_NODE_NAME
 
 # If IP_ADDRESS is empty, prompt the user to enter it manually
-IP_ADDRESS=$(curl -4s ifconfig.me)
+IP_ADDRESS=$(curl -4s ifconfig.me
 if [ -z "$IP_ADDRESS" ]; then
     echo "Could not automatically determine the server's IP address."
     echo "Please enter the server's external IP address manually:"
