@@ -5,11 +5,7 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
-# Check if the script is running in an interactive shell
-case $- in
-    *i*) ;;
-    *) echo "This script is intended to be run in an interactive shell."; exit 1 ;;
-esac
+set -euo pipefail
 
 # Check Ubuntu Version
 UBUNTU_VERSION=$(lsb_release -sr)
@@ -18,7 +14,10 @@ if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     exit 1
 fi
 
-set -euo pipefail
+# Set default values if not already set
+export GOPATH=${GOPATH:-"$HOME/go"}
+export GOROOT=${GOROOT:-"/usr/local/go"}
+export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
@@ -68,12 +67,6 @@ if [ "$CURRENT_GO_VERSION" != "1.21.1" ]; then
     wget https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz
     sudo tar -xvf go1.21.1.linux-amd64.tar.gz -C /usr/local
 fi
-
-# Set Go environment variables
-echo "export GOROOT=/usr/local/go" >> $HOME/.profile
-echo "export GOPATH=$HOME/go" >> $HOME/.profile
-echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> $HOME/.profile
-source $HOME/.profile
 
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -157,4 +150,4 @@ source $HOME/.profile
 
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
-tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
+tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' and tmux attach -t penumbra
