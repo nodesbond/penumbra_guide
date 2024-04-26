@@ -5,19 +5,14 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
+# Set bash to fail on error and undefined variable use, and fail on pipeline errors
+set -euo pipefail
+
 # Check Ubuntu Version
 UBUNTU_VERSION=$(lsb_release -sr)
 if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     echo "This script requires Ubuntu version 22 or higher. Your version is $UBUNTU_VERSION."
     exit 1
-fi
-
-set -euo pipefail
-
-# Ensure debian_chroot is not causing issues
-if ! grep -q "debian_chroot=" /root/.bashrc; then
-    echo "debian_chroot=\${debian_chroot:-}" >> /root/.bashrc
-    source /root/.bashrc
 fi
 
 # Remove previous versions of Penumbra and related modules
@@ -59,7 +54,9 @@ fi
 sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl bc
 sudo apt-get install tmux
-sudo apt autoremove -y  # Automatically remove unneeded packages
+
+# Automatically remove no longer required packages
+sudo apt autoremove -y
 
 # Check if Go is installed and update it if it is not version 1.21.1
 CURRENT_GO_VERSION=$(go version 2>/dev/null | grep -oP 'go\K[0-9.]+')
@@ -108,7 +105,7 @@ mv cometbft /root/cometbft/
 # Proceed with installation
 make install
 
-# Increase the number of allowed open file descriptors
+# Increase the number of allowed open file directories
 ulimit -n 4096
 
 # Request the node name from the user
@@ -158,4 +155,4 @@ source $HOME/.profile
 
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
-tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
+tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' and tmux attach -t penumbra
