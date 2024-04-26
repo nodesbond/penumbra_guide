@@ -5,7 +5,6 @@
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
-# Set bash to fail on error and undefined variable use, and fail on pipeline errors
 set -euo pipefail
 
 # Check Ubuntu Version
@@ -17,31 +16,29 @@ fi
 
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
-sudo rm -rf /root/penumbra /root/cometbft
+sudo rm -rf /root/penumbra /root/cometbft || true
 
 # Rename existing Penumbra directory (for updates)
 if [ -d "/root/penumbra" ]; then
-    mv /root/penumbra /root/penumbra_old
+    mv /root/penumbra /root/penumbra_old || true
 fi
 
 # Handle non-empty pcli directory
 PCLI_DIR="/root/.local/share/pcli"
 if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
-    echo "The pcli directory is not empty."
-    echo "Choose an action:"
+    echo "The pcli directory is not empty. Please choose an action:"
     echo "1) Rename and backup the existing directory"
     echo "2) Delete the existing directory (Warning: This will remove all existing data)"
     read -p "Enter choice [1-2]: " choice
-
     case $choice in
         1)
             BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
             echo "Renaming the existing directory to $BACKUP_DIR..."
-            mv "$PCLI_DIR" "$BACKUP_DIR"
+            mv "$PCLI_DIR" "$BACKUP_DIR" || true
             ;;
         2)
             echo "Removing the existing pcli directory..."
-            rm -rf "$PCLI_DIR"
+            rm -rf "$PCLI_DIR" || true
             ;;
         *)
             echo "Invalid choice. Exiting."
@@ -51,12 +48,10 @@ if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
 fi
 
 # Update package list and install dependencies
-sudo apt-get update
-sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl bc
-sudo apt-get install tmux
-
-# Automatically remove no longer required packages
-sudo apt autoremove -y
+sudo apt-get update || true
+sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl || true
+sudo apt-get install -y bc || true
+sudo apt autoremove -y || true
 
 # Check if Go is installed and update it if it is not version 1.21.1
 CURRENT_GO_VERSION=$(go version 2>/dev/null | grep -oP 'go\K[0-9.]+')
@@ -64,49 +59,49 @@ if [ "$CURRENT_GO_VERSION" != "1.21.1" ]; then
     echo "Updating Go to version 1.21.1..."
     sudo rm -rf /usr/local/go
     wget https://dl.google.com/go/go1.21.1.linux-amd64.tar.gz
-    sudo tar -xvf go1.21.1.linux-amd64.tar.gz -C /usr/local
+    sudo tar -xvf go1.21.1.linux-amd64.tar.gz -C /usr/local || true
 fi
 
 # Set Go environment variables
 echo "export GOROOT=/usr/local/go" >> $HOME/.profile
 echo "export GOPATH=$HOME/go" >> $HOME/.profile
 echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> $HOME/.profile
-source $HOME/.profile
+source $HOME/.profile || true
 
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source $HOME/.cargo/env
+source $HOME/.cargo/env || true
 
 # Clone Penumbra repository and checkout the specified version
-git clone https://github.com/penumbra-zone/penumbra
+git clone https://github.com/penumbra-zone/penumbra || true
 cd penumbra
-git fetch
-git checkout v0.73.0
+git fetch || true
+git checkout v0.73.0 || true
 
 # Build pcli and pd
-cargo build --release --bin pcli
-cargo build --release --bin pd
+cargo build --release --bin pcli || true
+cargo build --release --bin pd || true
 
 # Install CometBFT
 cd /root
-git clone https://github.com/cometbft/cometbft.git
+git clone https://github.com/cometbft/cometbft.git || true
 cd cometbft
-git checkout v0.37.5
+git checkout v0.37.5 || true
 
 # Update Go modules
-go mod tidy
+go mod tidy || true
 
 # Compile the cometbft executable
-go build -o cometbft ./cmd/cometbft
+go build -o cometbft ./cmd/cometbft || true
 
 # Move the compiled executable to the cometbft directory
-mv cometbft /root/cometbft/
+mv cometbft /root/cometbft/ || true
 
 # Proceed with installation
-make install
+make install || true
 
 # Increase the number of allowed open file directories
-ulimit -n 4096
+ulimit -n 4096 || true
 
 # Request the node name from the user
 echo "Enter the name of your node:"
@@ -128,8 +123,8 @@ fi
 
 # Join the testnet with specified external address and moniker
 cd /root/penumbra
-./target/release/pd testnet unsafe-reset-all
-./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
+./target/release/pd testnet unsafe-reset-all || true
+./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME" || true
 
 # Create a new wallet or restore an existing one
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
@@ -155,4 +150,4 @@ source $HOME/.profile
 
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
-tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' and tmux attach -t penumbra
+tmux new-session -d -s penumbra '/root/penumbra/target/release/pd start' && tmux split-window -h '/root/cometbft/cometbft start --home ~/.penumbra/testnet_data/node0/cometbft' && tmux attach -t penumbra
