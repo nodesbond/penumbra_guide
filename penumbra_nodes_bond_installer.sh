@@ -38,6 +38,13 @@ if [ -d "/root/penumbra" ]; then
     mv /root/penumbra /root/penumbra_old
 fi
 
+# Prepare environment for tmux to avoid losing session paths
+export TMUX_TMPDIR=$ORIGINAL_HOME/.tmux/tmp
+mkdir -p $TMUX_TMPDIR
+
+# Ensure the tmux server is running correctly
+tmux start-server
+
 # Handle non-empty pcli directory
 PCLI_DIR="/root/.local/share/pcli"
 if [ -d "$PCLI_DIR" ]; then
