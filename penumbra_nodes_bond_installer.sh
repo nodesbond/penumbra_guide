@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Author: nodes.bond
-# Penumbra Version: v0.70.3
+# Penumbra Version: v0.73.0
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
@@ -77,7 +77,7 @@ source $HOME/.cargo/env
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
 git fetch
-git checkout v0.71.0
+git checkout v0.73.0
 
 # Build pcli and pd
 cargo build --release --bin pcli
