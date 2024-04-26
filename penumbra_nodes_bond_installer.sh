@@ -12,6 +12,8 @@ if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     exit 1
 fi
 
+set -euo pipefail
+
 # Remove previous versions of Penumbra and related modules
 echo "Removing old versions of Penumbra and related modules..."
 sudo rm -rf /root/penumbra /root/cometbft
@@ -52,8 +54,6 @@ sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl
 sudo apt-get install -y bc  # Ensure bc is installed for version comparison
 sudo apt-get install tmux
-
-set -euo pipefail
 
 # Check if Go is installed and update it if it is not version 1.21.1
 CURRENT_GO_VERSION=$(go version 2>/dev/null | grep -oP 'go\K[0-9.]+') || true
