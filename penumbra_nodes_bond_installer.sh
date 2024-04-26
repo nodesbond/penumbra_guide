@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Check if running interactively and set PS1 if not
-if [ -z "$PS1" ]; then
-    echo "Setting default PS1 as the script is not running interactively."
-    export PS1='\h:\w\$ '
+# Check if running interactively and set necessary environment
+if [[ $- == *i* ]]; then
+    echo "Running in an interactive shell."
+else
+    echo "Setting minimal environment for non-interactive shell."
+    export PS1='[\u@\h \W]\$ '
+    # Define any other necessary variables here or fix the .bashrc to handle non-interactive cases
 fi
-
-# Ensure debian_chroot is set for .bashrc if used in the script
-export debian_chroot=${debian_chroot:-"default_value"}
 
 # Author: nodes.bond
 # Penumbra Version: v0.73.0
@@ -23,7 +23,6 @@ if (( $(echo "$UBUNTU_VERSION < 22" | bc -l) )); then
     exit 1
 fi
 
-# Set default values if not already set
 export GOPATH=${GOPATH:-"$HOME/go"}
 export GOROOT=${GOROOT:-"/usr/local/go"}
 export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
@@ -103,11 +102,11 @@ go mod tidy
 # Compile the cometbft executable
 go build -o cometbft ./cmd/cometbft
 
-# Move the compiled executable to the cometbft directory only if it does not already exist there
+# Move the compiled executable to a specific directory inside /root/cometbft if not already there
 if [ ! -f /root/cometbft/cometbft ]; then
     mv cometbft /root/cometbft/
 else
-    echo "Executable already in place, skipping move."
+    echo "Executable already in place."
 fi
 
 # Proceed with installation
