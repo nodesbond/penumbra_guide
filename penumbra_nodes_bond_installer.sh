@@ -33,14 +33,33 @@ fi
 PCLI_DIR="/root/.local/share/pcli"
 if [ -d "$PCLI_DIR" ] && [ "$(ls -A $PCLI_DIR)" ]; then
     echo "The pcli directory is not empty."
-    echo "Renaming the existing directory to backup..."
-    mv "$PCLI_DIR" "${PCLI_DIR}_backup_$(date +%F-%T)"
+    echo "Choose an action:"
+    echo "1) Rename and backup the existing directory"
+    echo "2) Delete the existing directory (Warning: This will remove all existing data)"
+    read -p "Enter choice [1-2]: " choice
+
+    case $choice in
+        1)
+            BACKUP_DIR="${PCLI_DIR}_backup_$(date +%F-%T)"
+            echo "Renaming the existing directory to $BACKUP_DIR..."
+            mv "$PCLI_DIR" "$BACKUP_DIR"
+            ;;
+        2)
+            echo "Removing the existing pcli directory..."
+            rm -rf "$PCLI_DIR"
+            ;;
+        *)
+            echo "Invalid choice. Exiting."
+            exit 1
+            ;;
+    esac
 fi
 
 # Update package list and install dependencies
 sudo apt-get update
 sudo apt-get install -y build-essential pkg-config libssl-dev clang git-lfs tmux libclang-dev curl bc
 sudo apt-get install tmux
+sudo apt autoremove -y  # Automatically remove unneeded packages
 
 # Check if Go is installed and update it if it is not version 1.21.1
 CURRENT_GO_VERSION=$(go version 2>/dev/null | grep -oP 'go\K[0-9.]+')
