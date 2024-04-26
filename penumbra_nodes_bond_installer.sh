@@ -139,7 +139,17 @@ cd /root/penumbra
 ./target/release/pd testnet unsafe-reset-all
 ./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
-# Create a new wallet or restore an existing one
+# Handle non-empty pcli directory more robustly
+PCLI_DIR="/tmp/.local/share/pcli"
+if [ -d "$PCLI_DIR" ]; then
+    if [ "$(ls -A $PCLI_DIR)" ]; then
+        echo "The pcli directory at $PCLI_DIR is not empty."
+        echo "Existing contents will be removed to continue with a clean initialization."
+        rm -rf ${PCLI_DIR:?}/* # Safeguard to prevent accidental deletion of unintended directories
+    fi
+fi
+
+# Proceed with creating or restoring wallet
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 if [ "$WALLET_CHOICE" = "new" ]; then
@@ -156,6 +166,7 @@ else
     echo "Invalid choice. Exiting."
     exit 1
 fi
+
 
 # Add pcli to the system path for simplified command usage
 echo "export PATH=\$PATH:/root/penumbra/target/release" >> $HOME/.profile
