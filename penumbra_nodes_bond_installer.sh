@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# Check if running interactively and set necessary environment
-if [[ $- == *i* ]]; then
-    echo "Running in an interactive shell."
-else
-    echo "Setting minimal environment for non-interactive shell."
-    export PS1='[\u@\h \W]\$ '
-    # Define any other necessary variables here or fix the .bashrc to handle non-interactive cases
+# Check if running interactively
+if [ -z "$PS1" ]; then
+    echo "Setting default PS1 as the script is not running interactively."
+    export PS1='\h:\w\$ '
 fi
+
+# Temporarily change the home directory to avoid sourcing .bashrc
+ORIGINAL_HOME=$HOME
+export HOME=/tmp
 
 # Author: nodes.bond
 # Penumbra Version: v0.73.0
@@ -102,12 +103,8 @@ go mod tidy
 # Compile the cometbft executable
 go build -o cometbft ./cmd/cometbft
 
-# Move the compiled executable to a specific directory inside /root/cometbft if not already there
-if [ ! -f /root/cometbft/cometbft ]; then
-    mv cometbft /root/cometbft/
-else
-    echo "Executable already in place."
-fi
+# Move the compiled executable to the cometbft directory
+mv cometbft /root/cometbft/
 
 # Proceed with installation
 make install
@@ -116,9 +113,10 @@ make install
 ulimit -n 4096
 
 # Request the node name from the user
+
+# Request the node name from the user
 echo "Enter the name of your node:"
 read MY_NODE_NAME
-
 # If IP_ADDRESS is empty, prompt the user to enter it manually
 IP_ADDRESS=$(curl -4s ifconfig.me)
 if [ -z "$IP_ADDRESS" ]; then
@@ -159,6 +157,9 @@ fi
 # Add pcli to the system path for simplified command usage
 echo "export PATH=\$PATH:/root/penumbra/target/release" >> $HOME/.profile
 source $HOME/.profile
+
+# Restore original home directory at end of script
+export HOME=$ORIGINAL_HOME
 
 # Launch the node and CometBFT in tmux
 tmux kill-session -t penumbra
