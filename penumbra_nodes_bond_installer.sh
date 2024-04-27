@@ -38,9 +38,9 @@ if [ -d "/root/penumbra" ]; then
     mv /root/penumbra /root/penumbra_old
 fi
 
-# Prepare environment for tmux to avoid losing session paths
-export TMUX_TMPDIR=$ORIGINAL_HOME/.tmux/tmp
-mkdir -p $TMUX_TMPDIR
+# Explicitly set the tmux temporary directory
+export TMUX_TMPDIR="/root/.tmux"
+mkdir -p "$TMUX_TMPDIR"
 
 # Ensure the tmux server is running correctly
 tmux start-server
