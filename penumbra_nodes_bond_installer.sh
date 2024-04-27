@@ -165,6 +165,5 @@ source $HOME/.profile
 
 # Restore original home directory after detaching from TMUX
 export HOME=$ORIGINAL_HOME
-tmux attach -t penumbra
 
 echo "Installation is complete.  Run the tmux window to start the node."
