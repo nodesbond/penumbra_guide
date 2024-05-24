@@ -11,7 +11,7 @@ ORIGINAL_HOME=$HOME
 export HOME=/tmp
 
 # Author: nodes.bond
-# Penumbra Version: v0.75.0
+# Penumbra Version: v0.75.1
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
@@ -76,7 +76,7 @@ source $HOME/.cargo/env
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
 git fetch
-git checkout v0.75.0
+git checkout v0.75.1
 cargo build --release --bin pcli
 cargo build --release --bin pd
 
@@ -130,8 +130,8 @@ echo "Using IP address: $IP_ADDRESS"
 
 
 cd /root/penumbra
-./target/release/pd testnet unsafe-reset-all
-./target/release/pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
+pd testnet unsafe-reset-all
+pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
 # Handle non-empty pcli directory
 PCLI_DIR="/tmp/.local/share/pcli"
@@ -147,14 +147,14 @@ fi
 echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
 read WALLET_CHOICE
 if [ "$WALLET_CHOICE" = "new" ]; then
-    SEED_PHRASE=$(./target/release/pcli init soft-kms generate)
+    SEED_PHRASE=$(pcli init soft-kms generate)
     echo "Your seed phrase is: $SEED_PHRASE"
     echo "Write down your seed phrase and keep it safe. Press any key to continue."
     read -n 1 -s
 elif [ "$WALLET_CHOICE" = "restore" ]; then
     echo "Enter your seed phrase:"
     read SEED_PHRASE
-    echo $SEED_PHRASE | ./target/release/pcli init soft-kms import-phrase
+    echo $SEED_PHRASE | pcli init soft-kms import-phrase
 else
     echo "Invalid choice. Exiting."
     exit 1
