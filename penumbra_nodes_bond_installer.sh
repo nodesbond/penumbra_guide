@@ -143,22 +143,7 @@ if [ -d "$PCLI_DIR" ]; then
     fi
 fi
 
-# Configure wallet
-echo "Do you want to create a new wallet or restore an existing one? [new/restore]"
-read WALLET_CHOICE
-if [ "$WALLET_CHOICE" = "new" ]; then
-    SEED_PHRASE=$(pcli init soft-kms generate)
-    echo "Your seed phrase is: $SEED_PHRASE"
-    echo "Write down your seed phrase and keep it safe. Press any key to continue."
-    read -n 1 -s
-elif [ "$WALLET_CHOICE" = "restore" ]; then
-    echo "Enter your seed phrase:"
-    read SEED_PHRASE
-    echo $SEED_PHRASE | pcli init soft-kms import-phrase
-else
-    echo "Invalid choice. Exiting."
-    exit 1
-fi
+
 
 echo "export PATH=\$PATH:/root/penumbra/target/release" >> $HOME/.profile
 source $HOME/.profile
