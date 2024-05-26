@@ -76,7 +76,7 @@ source $HOME/.cargo/env
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
 git fetch
-git checkout v0.76
+git checkout v0.76.0
 cargo build --release --bin pcli
 cargo build --release --bin pd
 
