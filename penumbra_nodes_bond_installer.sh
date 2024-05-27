@@ -131,7 +131,8 @@ echo "Using IP address: $IP_ADDRESS"
 
 cd /root/penumbra
 pd testnet unsafe-reset-all
-pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
+pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME" \
+    --archive-url "https://snapshots.penumbra.zone/testnet/pd-migrated-state-75-76.tar.gz"
 
 #Apply the migration with 
 pd migrate --force --home /root/penumbra/target/release/pd --comet-home /root/cometbft/cometbft
