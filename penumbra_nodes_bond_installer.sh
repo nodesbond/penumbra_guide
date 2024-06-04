@@ -11,7 +11,7 @@ ORIGINAL_HOME=$HOME
 export HOME=/tmp
 
 # Author: nodes.bond
-# Penumbra Version: v0.76
+# Penumbra Version: v0.77.1
 # Go Version: 1.21.1
 # Cometbft Version: v0.37.5
 
@@ -76,7 +76,7 @@ source $HOME/.cargo/env
 git clone https://github.com/penumbra-zone/penumbra
 cd penumbra
 git fetch
-git checkout v0.76.0
+git checkout v0.77.1
 cargo build --release --bin pcli
 cargo build --release --bin pd
 
@@ -131,11 +131,7 @@ echo "Using IP address: $IP_ADDRESS"
 
 cd /root/penumbra
 pd testnet unsafe-reset-all
-pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME" \
-    --archive-url "https://snapshots.penumbra.zone/testnet/pd-migrated-state-75-76.tar.gz"
-
-#Apply the migration with 
-pd migrate --force --home /root/penumbra/target/release/pd --comet-home /root/cometbft/cometbft
+pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME"
 
 # Handle non-empty pcli directory
 PCLI_DIR="/tmp/.local/share/pcli"
