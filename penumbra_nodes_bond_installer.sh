@@ -97,8 +97,7 @@ else
     echo "Executable already in place."
 fi
 
-# Proceed with installation
-make install
+
 
 # Prepare for node operation
 make install
