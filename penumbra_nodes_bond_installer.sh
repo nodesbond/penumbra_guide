@@ -89,7 +89,13 @@ go mod tidy
 
 # Compile the cometbft executable
 go build -o cometbft ./cmd/cometbft
-sudo cp cometbft /usr/local/bin/cometbft
+
+# Move the compiled executable to a specific directory inside /root/cometbft if not already there
+if [ ! -f /root/cometbft/cometbft ]; then
+    mv cometbft /root/cometbft/
+else
+    echo "Executable already in place."
+fi
 
 # Prepare for node operation
 make install
@@ -98,30 +104,42 @@ ulimit -n 4096
 # Set up node configuration
 echo "Enter the name of your node:"
 read MY_NODE_NAME
-echo "Enter the external IP address of your node (leave blank if behind a firewall):"
-read IP_ADDRESS
+# Attempt to automatically determine the external IP address
+IP_ADDRESS=$(curl -4s ifconfig.me)
 
-# Join the network
-cd /root/penumbra
-./target/release/pd testnet join --moniker "$MY_NODE_NAME" --external-address "$IP_ADDRESS:26656" http://penumbra.nodes.bond:26657
+# If the IP address is empty, prompt the user to enter it manually
+if [ -z "$IP_ADDRESS" ]; then
+    echo "Could not automatically determine the server's IP address."
+    echo "Please enter your server's external IP address manually:"
+    read IP_ADDRESS
+fi
 
-# Fetch genesis file
-curl -L https://your.genesis.json.url -o /root/.penumbra/network_data/node0/cometbft/config/genesis.json
+# Validate the IP address format
+if [[ ! $IP_ADDRESS =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Invalid IP address format. Please enter a valid IP address."
+    exit 1
+fi
 
-# Configure systemd services for Penumbra and CometBFT
-curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/penumbra-zone/penumbra/main/deployments/systemd/penumbra.service > penumbra.service
-sed -i -E "s/User=penumbra/User=$(whoami)/g" penumbra.service
-sudo cp penumbra.service /etc/systemd/system/penumbra.service
+# Continue with using the IP_ADDRESS in further commands
+echo "Using IP address: $IP_ADDRESS"
 
-curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/penumbra-zone/penumbra/main/deployments/systemd/cometbft.service > cometbft.service
-sed -i -E "s/User=penumbra/User=$(whoami)/g" cometbft.service
-sed -i -E "s+ExecStart=/usr/local/bin/cometbft start --home /home/penumbra/.penumbra/network_data/node0/cometbft+ExecStart=/usr/local/bin/cometbft start --home $HOME/.penumbra/network_data/node0/cometbft+g" cometbft.service
-sudo cp cometbft.service /etc/systemd/system/cometbft.service
+# Join the Penumbra network
+./target/release/pd network join --moniker "$MY_NODE_NAME" --external-address "$IP_ADDRESS:26656" http://void.s9.gay:26657
 
-sudo systemctl daemon-reload
-sudo systemctl start penumbra
-sudo systemctl start cometbft
-sudo systemctl enable penumbra
-sudo systemctl enable cometbft
+# Handle non-empty pcli directory
+PCLI_DIR="/tmp/.local/share/pcli"
+if [ -d "$PCLI_DIR" ]; then
+    if [ "$(ls -A $PCLI_DIR)" ]; then
+        echo "The pcli directory at $PCLI_DIR is not empty."
+        echo "Existing contents will be removed to continue with a clean initialization."
+        rm -rf ${PCLI_DIR:?}/*  # Using parameter expansion to avoid catastrophic deletion
+    fi
+fi
 
-echo "Installation is complete. Penumbra and CometBFT services are now running."
+echo "export PATH=\$PATH:/root/penumbra/target/release" >> $HOME/.profile
+source $HOME/.profile
+
+# Restore original home directory after detaching from TMUX
+export HOME=$ORIGINAL_HOME
+
+echo "Installation is complete. Run the tmux window to start the node."
