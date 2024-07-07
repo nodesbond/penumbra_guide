@@ -103,7 +103,7 @@ read IP_ADDRESS
 
 # Join the network
 cd /root/penumbra
-./target/release/pd network join --moniker "$MY_NODE_NAME" --external-address "$IP_ADDRESS:26656" http://penumbra.nodes.bond:26657
+./target/release/pd network join --moniker "$MY_NODE_NAME" --external-address "$IP_ADDRESS:26656" https://void.s9.gay:26657
 
 # Configure systemd services for Penumbra and CometBFT
 curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/penumbra-zone/penumbra/main/deployments/systemd/penumbra.service > penumbra.service
