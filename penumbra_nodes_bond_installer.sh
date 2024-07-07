@@ -129,19 +129,9 @@ echo "Using IP address: $IP_ADDRESS"
 
 
 cd /root/penumbra
-pd testnet unsafe-reset-all
-pd testnet join --external-address $IP_ADDRESS:26656 --moniker "$MY_NODE_NAME" \
-    --archive-url "https://snapshots.penumbra.zone/testnet/pd-migrated-state-77-78.tar.gz"
+pd pcli view reset
+pd network unsafe-reset-all
 
-# Handle non-empty pcli directory
-PCLI_DIR="/tmp/.local/share/pcli"
-if [ -d "$PCLI_DIR" ]; then
-    if [ "$(ls -A $PCLI_DIR)" ]; then
-        echo "The pcli directory at $PCLI_DIR is not empty."
-        echo "Existing contents will be removed to continue with a clean initialization."
-        rm -rf ${PCLI_DIR:?}/*  # Using parameter expansion to avoid catastrophic deletion
-    fi
-fi
 
 
 
