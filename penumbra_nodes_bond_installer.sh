@@ -103,7 +103,10 @@ read IP_ADDRESS
 
 # Join the network
 cd /root/penumbra
-./target/release/pd network join --moniker "$MY_NODE_NAME" --external-address "$IP_ADDRESS:26656" http://void.s9.gay:26657
+./target/release/pd testnet join --moniker "$MY_NODE_NAME" --external-address "$IP_ADDRESS:26656" http://penumbra.nodes.bond:26657
+
+# Fetch genesis file
+curl -L https://your.genesis.json.url -o /root/.penumbra/network_data/node0/cometbft/config/genesis.json
 
 # Configure systemd services for Penumbra and CometBFT
 curl --proto '=https' --tlsv1.2 -LsSf https://raw.githubusercontent.com/penumbra-zone/penumbra/main/deployments/systemd/penumbra.service > penumbra.service
