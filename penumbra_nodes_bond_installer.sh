@@ -122,6 +122,20 @@ if [[ ! $IP_ADDRESS =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
+pd network join \
+    --moniker "$MY_NODE_NAME" \
+    --external-address $IP_ADDRESS:26656
+    
+# Handle non-empty pcli directory
+PCLI_DIR="/tmp/.local/share/pcli"
+if [ -d "$PCLI_DIR" ]; then
+    if [ "$(ls -A $PCLI_DIR)" ]; then
+        echo "The pcli directory at $PCLI_DIR is not empty."
+        echo "Existing contents will be removed to continue with a clean initialization."
+        rm -rf ${PCLI_DIR:?}/*  # Using parameter expansion to avoid catastrophic deletion
+    fi
+fi
+
 # Continue with using the IP_ADDRESS in further commands
 echo "Using IP address: $IP_ADDRESS"
 # Example of further use: Adjust according to your actual needs
