@@ -69,12 +69,13 @@ if ! command -v go > /dev/null; then
 fi
 
 # Install Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 source $HOME/.cargo/env
 
 # Clone and set up Penumbra
-git clone https://github.com/penumbra-zone/penumbra
-cd penumbra
+mkdir -p /root/penumbra
+cd /root/penumbra
+git clone https://github.com/penumbra-zone/penumbra .
 git fetch
 git checkout v0.79.0
 cargo build --release --bin pcli
